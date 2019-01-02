@@ -29,8 +29,8 @@ if [ $(grep -q "VENDOR ABAQUSLM" "$LICENSE") ]
 then
     echo WARNING: $LICENSE does not appear to be a Flexnet license file.
     echo You may have received a DSLS license or there may be other problems.
-    read -p "Continue? [y]/n " cont
-    test "$cont" = "n" && exit 1
+    read -p "Continue? [y]/n " response
+    test "$response" = "n" && exit 1
 else
     echo $LICENSE includes the following features:
     grep FEATURE "$LICENSE"
@@ -57,8 +57,8 @@ do
     then
         LMBIN=$(dirname $d)
         echo Found: $LMBIN
-        read -p "Continue? [y]/n " cont
-        test "$cont" = "n" && exit 1
+        read -p "Continue? [y]/n " response
+        test "$response" = "n" && exit 1
         break # stop when lmgrd is found
     fi
 done
