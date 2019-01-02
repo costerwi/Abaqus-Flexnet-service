@@ -1,23 +1,54 @@
 #!/bin/bash
-SIMULIA=${SIMULIA:-/opt/CAE/SIMULIA}
-LMADMIN=${LMADMIN:-lmadmin}
+cat << INTRO
+This script installs the Abaqus Flexnet License Daemon as a restartable
+service on Linux computers.
 
-if ! [ id -u == 0 ] # {{{1 Check for root
+The service will be started by this script and will be set to start when the
+system boots.
+
+If you have any questions, please contact support@caelynx.com
+
+INTRO
+
+if [ ! $(id -u) -eq 0 ] # {{{1 Check for root
 then
-    echo ERROR: Must have root permissions to make config changes.
+    echo ERROR: You must have root permissions to make config changes.
     exit 1
 fi
 
-LICENSE=shift
-if ! [ -f $LICENSE ]
+LICENSE=$1
+test -f "$LICENSE" || read -p "Enter license file name: " LICENSE
+if [ ! -f $LICENSE ]
 then
-    echo License file not found.
-    echo Please provide license path on commandline:
-    echo $0 mylicensefile.lic
+    echo License file "$LICENSE" not found.
     exit 1
 fi
 
-echo Searching for Abaqus Flexnet software within $SIMULIA # {{{1
+# {{{1 Check format of license file
+if [ $(grep -q "VENDOR ABAQUSLM" "$LICENSE") ]
+then
+    echo WARNING: $LICENSE does not appear to be a Flexnet license file.
+    echo You may have received a DSLS license or there may be other problems.
+    read -p "Continue? [y]/n " cont
+    test "$cont" = "n" && exit 1
+else
+    echo $LICENSE includes the following features:
+    grep FEATURE "$LICENSE"
+fi
+
+# {{{1 Check for SIMULIA in common locations
+for d in $SIMULIA /usr/SIMULIA/License /usr/SIMULIA /opt/CAE/SIMULIA
+do
+    if [ -d "$d" ]
+    then
+        SIMULIA=$d
+        break
+    fi
+done
+
+test -d $SIMULIA || read -p "Enter directory to search for license server: " SIMULIA
+
+echo Searching for Abaqus Flexnet software within $SIMULIA
 abaquslm=( $(find $SIMULIA -name ABAQUSLM) )
 
 for d in ${abaquslm[@]}
@@ -26,50 +57,52 @@ do
     then
         LMBIN=$(dirname $d)
         echo Found: $LMBIN
+        read -p "Continue? [y]/n " cont
+        test "$cont" = "n" && exit 1
         break # stop when lmgrd is found
     fi
 done
 test -f "$LMBIN/lmgrd" || {
     echo Abaqus Flexnet license software was not found.
-    echo You may specify the SIMULIA search directory on command line:
-    echo SIMULIA=/my/path/to/SIMULIA $0 mylicensefile.lic
     exit 1 # exit if lmgrd is not found
 }
 
-if id -u $LMADMIN >/dev/null # {{{1 check for user
+LMADMIN=${LMADMIN:-lmadmin} # {{{1 check for user
+if id -u $LMADMIN >/dev/null 2>&1
 then
-    echo License administrator $LMADMIN exists
+    echo License administrator $LMADMIN exists and will be used
 else
     echo Creating license administrator $LMADMIN
     useradd --system --home-dir /sbin --shell /sbin/nologin --comment "Abaqus license administrator" $LMADMIN || exit 1
 fi
 
-echo Creating license file directory
+echo Setting up the license file directory
 licdir=/etc/abaqus-lm
-mkdir --verbose $licdir
-chown --verbose $LMADMIN $licdir || exit 1
-chmod --verbose 755 $licdir || exit 1
+test -d $licdir || mkdir --verbose $licdir
+chmod --verbose 2755 $licdir || exit 1
 cp --verbose $LICENSE $licdir || exit 1
 cat >$licdir/README <<README
 This directory will be scanned to find the current Abaqus license.
-License files must end with .lic
 Please contact support@caelynx.com if you have any trouble.
+License files must end with .lic
 Copy your new license here and then reload the abaqus-lm service to refresh:
 README
 chmod --verbose 644 $licdir/README
+chown --verbose --recursive $LMADMIN.$LMADMIN $licdir || exit 1
 
-echo Creating log file directory
+echo Setting up log file directory
 logdir=/var/log/abaqus-lm
-mkdir --verbose $logdir
+test -d $logdir || mkdir --verbose $logdir
 chown --verbose $LMADMIN $logdir || exit 1
 chmod --verbose 755 $licdir || exit 1
 
 if pidof systemd >/dev/null # {{{1 systemd system
 then
-service=/etc/systemd/system/abaqus-lm.service
-echo Creating systemd service $service
+sysd=/etc/systemd/system
+service=abaqus-lm.service
+echo Creating systemd service $sysd/$service
 
-cat >$service <<SERVICE || exit 1
+cat >$sysd/$service <<SERVICE || exit 1
 [Unit]
 Description=Abaqus flexlm license daemon
 After=network.target
@@ -83,12 +116,12 @@ ExecReload=$LMBIN/lmreread -c $licdir
 [Install]
 WantedBy=multi-user.target
 SERVICE
-chmod -v 664 $service || exit 1
+chmod -v 664 $sysd/$service || exit 1
 
 echo Starting the service $service
 systemctl daemon-reload # Parse the new service file
 systemctl enable --now $service # Start now and enable on reboot
-echo systemctl reload ${service%.*} >>$logdir/README
+echo systemctl reload ${service%.*} >>$licdir/README
 
 else # {{{1 Assume SysV init
 service=/etc/rc.d/init.d/abaqus-lm
@@ -171,7 +204,7 @@ chmod --verbose 755 $service || exit 1
 
 chkconfig --add $(basename $service)
 service $(basename $service) start
-echo service $(basename $service) reload >>$logdir/README
+echo service $(basename $service) reload >>$licdir/README
 
 fi
 
