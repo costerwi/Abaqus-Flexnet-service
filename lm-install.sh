@@ -39,6 +39,15 @@ else
     read -p "Continue? [y]/n " response
     test "$response" = "n" && exit 1
 fi
+echo
+
+# {{{1 Check if currently running
+if lmgrd_pid=($(pidof lmgrd))
+then
+    echo $warning There is already a Flexnet license server running:
+    ps -p "${lmgrd_pid[@]}" -o pid,cmd
+    #TODO get the base directory of this running lmgrd
+    echo
     read -p "Continue? [y]/n " response
     test "$response" = "n" && exit 1
 fi
