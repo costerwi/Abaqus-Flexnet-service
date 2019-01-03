@@ -48,7 +48,7 @@ then
     ps -p "${lmgrd_pid[@]}" -o pid,cmd
     #TODO get the base directory of this running lmgrd
     echo
-    read -p "Continue? [y]/n " response
+    read -p "Continue installing this service? [y]/n " response
     test "$response" = "n" && exit 1
 fi
 
@@ -80,7 +80,7 @@ do
     fi
 done
 test -f "$LMBIN/lmgrd" || {
-    echo Abaqus Flexnet license software was not found.
+    echo $error Abaqus Flexnet license software was not found.
     exit 1 # exit if lmgrd is not found
 }
 
