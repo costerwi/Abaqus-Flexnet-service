@@ -66,16 +66,16 @@ test -d $SIMULIA || read -p "Enter base directory to search for license server: 
 
 # {{{1 Search for lmgrd and ABAQUSLM within SIMULIA
 echo Searching for Abaqus Flexnet software within $SIMULIA
-abaquslm=( $(find $SIMULIA -name ABAQUSLM) )
+abaquslm=( $(find $SIMULIA -name ABAQUSLM | sort -r) )
 
 for d in ${abaquslm[@]}
 do
     if [ -f $(dirname $d)/lmgrd ]
     then
+        echo Found: $d
+        read -p "Use this instance? [y]/n " response
+        test "$response" = "n" && continue
         LMBIN=$(dirname $d)
-        echo Found: $LMBIN
-        read -p "Continue? [y]/n " response
-        test "$response" = "n" && exit 1
         break # stop when lmgrd is found
     fi
 done
