@@ -10,7 +10,7 @@ If you have any questions, please contact support@caelynx.com
 
 INTRO
 
-if [ ! $(id -u) -eq 0 ] # {{{1 Check for root
+if [ $(id -u) -ne 0 ] # {{{1 Got root?
 then
     echo ERROR: You must have root permissions to make config changes.
     exit 1
