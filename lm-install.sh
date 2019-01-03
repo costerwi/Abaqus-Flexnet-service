@@ -10,9 +10,12 @@ If you have any questions, please contact support@caelynx.com
 
 INTRO
 
+error=$(tput setaf 1)ERROR:$(tput sgr 0) || error="ERROR:"
+warning=$(tput setab 3)WARNING:$(tput sgr 0) || warning="WARNING:"
+
 if [ $(id -u) -ne 0 ] # {{{1 Got root?
 then
-    echo ERROR: You must have root permissions to make config changes.
+    echo $error You must have root permissions to make config changes.
     exit 1
 fi
 
@@ -25,15 +28,19 @@ then
 fi
 
 # {{{1 Check format of license file
-if [ $(grep -q "VENDOR ABAQUSLM" "$LICENSE") ]
+if grep -q "VENDOR ABAQUSLM" "$LICENSE"
 then
-    echo WARNING: $LICENSE does not appear to be a Flexnet license file.
-    echo You may have received a DSLS license or there may be other problems.
-    read -p "Continue? [y]/n " response
-    test "$response" = "n" && exit 1
-else
     echo $LICENSE includes the following features:
     grep FEATURE "$LICENSE"
+else
+    echo $warning $LICENSE does not appear to be a Flexnet license file.
+    echo You may have received a DSLS license or there may be other problems.
+    #TODO check for DSLS and add support for DSLS license server
+    read -p "Continue? [y]/n " response
+    test "$response" = "n" && exit 1
+fi
+    read -p "Continue? [y]/n " response
+    test "$response" = "n" && exit 1
 fi
 
 # {{{1 Check for SIMULIA in common locations
