@@ -19,7 +19,7 @@ then
     exit 1
 fi
 
-LICENSE=$1
+LICENSE=$1 # {{{1 Check for existence license file
 test -f "$LICENSE" || read -p "Enter license file name: " LICENSE
 if [ ! -f $LICENSE ]
 then
@@ -64,6 +64,7 @@ done
 
 test -d $SIMULIA || read -p "Enter directory to search for license server: " SIMULIA
 
+# {{{1 Search for lmgrd and ABAQUSLM within SIMULIA
 echo Searching for Abaqus Flexnet software within $SIMULIA
 abaquslm=( $(find $SIMULIA -name ABAQUSLM) )
 
@@ -92,6 +93,7 @@ else
     useradd --system --home-dir /sbin --shell /sbin/nologin --comment "Abaqus license administrator" $LMADMIN || exit 1
 fi
 
+# {{{1 Setup license file directory
 echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d $licdir || mkdir --verbose $licdir
@@ -106,6 +108,7 @@ README
 chmod --verbose 644 $licdir/README
 chown --verbose --recursive $LMADMIN.$LMADMIN $licdir || exit 1
 
+# {{{1 Setup log file rotate
 echo Setting up log file directory
 logdir=/var/log/abaqus-lm
 test -d $logdir || mkdir --verbose $logdir
@@ -241,6 +244,6 @@ LOGROTATE
 chmod --verbose 644 $logrotate || exit 1
 fi
 
-# TODO Firewall
+# TODO Firewall {{{1
 
 # vim: foldmethod=marker
