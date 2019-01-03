@@ -62,7 +62,7 @@ do
     fi
 done
 
-test -d $SIMULIA || read -p "Enter directory to search for license server: " SIMULIA
+test -d $SIMULIA || read -p "Enter base directory to search for license server: " SIMULIA
 
 # {{{1 Search for lmgrd and ABAQUSLM within SIMULIA
 echo Searching for Abaqus Flexnet software within $SIMULIA
