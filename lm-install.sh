@@ -1,10 +1,10 @@
 #!/bin/bash
 cat << INTRO
-This script installs the Abaqus Flexnet License Daemon as a restartable
+This script configures the Abaqus Flexnet License Daemon as a restartable
 service on Linux computers.
 
-The service will be started by this script and will be set to start when the
-system boots.
+The service will be started by this script and will also be set to autostart
+whenever the system boots.
 
 If you have any questions, please contact support@caelynx.com
 
