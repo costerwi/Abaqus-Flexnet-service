@@ -135,7 +135,7 @@ ExecReload=$LMBIN/lmreread -c $licdir
 [Install]
 WantedBy=multi-user.target
 SERVICE
-chmod -v 664 $sysd/$service || exit 1
+chmod --verbose 664 $sysd/$service || exit 1
 
 echo Starting the service $service
 systemctl daemon-reload # Parse the new service file
@@ -143,9 +143,10 @@ systemctl enable --now $service # Start now and enable on reboot
 echo systemctl reload ${service%.*} >>$licdir/README
 
 else # {{{1 Assume SysV init
-service=/etc/rc.d/init.d/abaqus-lm
-echo Creating SysV init script $service
-cat >$service <<SCRIPT || exit 1
+initd=/etc/rc.d/init.d
+service=abaqus-lm
+echo Creating SysV init script $initd/$service
+cat >$initd/$service <<SCRIPT || exit 1
 #!/bin/sh
 #
 # chkconfig: - 91 35
@@ -219,11 +220,11 @@ esac
 
 exit \$?
 SCRIPT
-chmod --verbose 755 $service || exit 1
+chmod --verbose 755 $initd/$service || exit 1
 
-chkconfig --add $(basename $service)
-service $(basename $service) start
-echo service $(basename $service) reload >>$licdir/README
+chkconfig --add $service
+service $service start
+echo service $service reload >>$licdir/README
 
 fi
 
