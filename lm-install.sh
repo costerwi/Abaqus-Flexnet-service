@@ -1,5 +1,5 @@
 #!/bin/bash
-cat << INTRO
+echo "
 This script configures the Abaqus Flexnet License Daemon as a restartable
 service on Linux Redhat/CentOS version 6.x or 7.x computers.
 
@@ -8,7 +8,7 @@ autostart whenever the system boots.
 
 If you have any questions, please contact support@caelynx.com
 
-INTRO
+"
 
 error=$(tput setaf 1)ERROR:$(tput sgr 0) || error="ERROR:"
 warning=$(tput setab 3)WARNING:$(tput sgr 0) || warning="WARNING:"
@@ -113,12 +113,12 @@ licdir=/etc/abaqus-lm
 test -d $licdir || mkdir --verbose $licdir
 chmod --verbose 2755 "$licdir" || exit 1
 cp --verbose "$LICENSE" "$licdir" || exit 1
-cat >$licdir/README <<README
+echo -n "\
 This directory will be scanned to find the current Abaqus license.
 Please contact support@caelynx.com if you have any trouble.
 License file names must end with .LIC
 Copy your new license here and then reload the license service to refresh:
-README
+" > "$licdir/README"
 chmod --verbose 644 "$licdir/README"
 chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
 echo $note Save new license files in $licdir
@@ -135,15 +135,14 @@ logrotate=/etc/logrotate.d/abaqus-lm
 if [ -d "$(dirname $logrotate)" ]
 then
 echo Creating "$logrotate"
-cat >"$logrotate" <<LOGROTATE || exit 1
+echo "\
 $logdir/*.log {
     missingok
     notifyempty
     sharedscripts
     delaycompress
     endscript
-}
-LOGROTATE
+}" >"$logrotate" || exit 1
 chmod --verbose 644 "$logrotate" || exit 1
 fi
 
@@ -153,7 +152,7 @@ sysd=/etc/systemd/system
 service=abaqus-lm.service
 echo Creating systemd service "$sysd/$service"
 
-cat >"$sysd/$service" <<SERVICE || exit 1
+echo "\
 [Unit]
 Description=Abaqus flexlm license daemon
 After=network.target
@@ -165,8 +164,7 @@ ExecStop=$LMBIN/lmdown -q -c $licdir
 ExecReload=$LMBIN/lmreread -c $licdir
 
 [Install]
-WantedBy=multi-user.target
-SERVICE
+WantedBy=multi-user.target" >"$sysd/$service" || exit 1
 chmod --verbose 664 "$sysd/$service" || exit 1
 
 echo Starting the service $service
@@ -178,7 +176,7 @@ else # {{{1 Assume SysV init
 initd=/etc/rc.d/init.d
 service=abaqus-lm
 echo Creating SysV init script $initd/$service
-cat >"$initd/$service" <<SCRIPT || exit 1
+echo "\
 #!/bin/sh
 #
 # chkconfig: - 91 35
@@ -198,13 +196,13 @@ LM_LICENSE_FILE=$licdir
 LMBIN=$LMBIN
 
 start() {
-    echo -n \$"Starting \$KIND services: "
+    echo -n \$\"Starting \$KIND services: \"
     daemon --user $LMADMIN \$LMBIN/lmgrd -c \$LM_LICENSE_FILE -l +$logdir/lmgrd.log
     return \$?
 }
 
 stop() {
-    echo -n \$"Shutting down \$KIND services: "
+    echo -n \$\"Shutting down \$KIND services: \"
     \$LMBIN/lmdown -c \$LM_LICENSE_FILE -q >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
@@ -217,7 +215,7 @@ restart() {
 }
 
 reload() {
-    echo -n \$"Reloading \$LM_LICENSE_FILE directory: "
+    echo -n \$\"Reloading \$LM_LICENSE_FILE directory: \"
     \$LMBIN/lmreread -c \$LM_LICENSE_FILE >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
@@ -229,7 +227,7 @@ status() {
     return \$?
 }
 
-case "\$1" in
+case \"\$1\" in
   start)
     start
     ;;
@@ -246,12 +244,11 @@ case "\$1" in
     status
     ;;
   *)
-    echo \$"Usage: \$0 {start|stop|restart|reload|status}"
+    echo \$\"Usage: \$0 {start|stop|restart|reload|status}\"
     exit 2
 esac
 
-exit \$?
-SCRIPT
+exit \$?" >"$initd/$service" || exit 1
 chmod --verbose 755 "$initd/$service" || exit 1
 
 chkconfig --add $service
