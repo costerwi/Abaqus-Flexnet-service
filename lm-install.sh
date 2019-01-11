@@ -121,7 +121,7 @@ README
 chmod --verbose 644 "$licdir/README"
 chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
 
-# {{{1 Setup log file rotate
+# {{{1 Setup log file directory
 echo Setting up log file directory
 logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
