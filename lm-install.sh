@@ -1,7 +1,7 @@
 #!/bin/bash
 cat << INTRO
 This script configures the Abaqus Flexnet License Daemon as a restartable
-service on Linux Redhat/CentOS computers.
+service on Linux Redhat/CentOS version 6.x or 7.x computers.
 
 The license service will be started by this script and will also be set to
 autostart whenever the system boots.
