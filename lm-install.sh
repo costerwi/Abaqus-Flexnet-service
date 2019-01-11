@@ -128,6 +128,23 @@ test -d "$logdir" || mkdir --verbose "$logdir"
 chown --verbose "$LMADMIN" "$logdir" || exit 1
 chmod --verbose 755 "$logdir" || exit 1
 
+# {{{1 Setup logrotate
+logrotate=/etc/logrotate.d/abaqus-lm
+if [ -d "$(dirname $logrotate)" ]
+then
+echo Creating "$logrotate"
+cat >"$logrotate" <<LOGROTATE || exit 1
+$logdir/*.log {
+    missingok
+    notifyempty
+    sharedscripts
+    delaycompress
+    endscript
+}
+LOGROTATE
+chmod --verbose 644 "$logrotate" || exit 1
+fi
+
 if pidof systemd >/dev/null # {{{1 systemd system
 then
 sysd=/etc/systemd/system
@@ -239,23 +256,6 @@ chkconfig --add $service
 service $service start
 echo service $service reload >>"$licdir/README"
 
-fi
-
-# {{{1 Setup logrotate
-logrotate=/etc/logrotate.d/abaqus-lm
-if [ -d "$(dirname $logrotate)" ]
-then
-echo Creating "$logrotate"
-cat >"$logrotate" <<LOGROTATE || exit 1
-$logdir/*.log {
-    missingok
-    notifyempty
-    sharedscripts
-    delaycompress
-    endscript
-}
-LOGROTATE
-chmod --verbose 644 "$logrotate" || exit 1
 fi
 
 # TODO Firewall {{{1
