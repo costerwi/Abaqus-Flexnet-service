@@ -110,7 +110,7 @@ fi
 # {{{1 Setup license file directory
 echo Setting up the license file directory
 licdir=/etc/abaqus-lm
-test -d $licdir || mkdir --verbose $licdir
+test -d "$licdir" || mkdir --verbose "$licdir"
 chmod --verbose 2755 "$licdir" || exit 1
 cp --verbose "$LICENSE" "$licdir" || exit 1
 echo -n "\
@@ -121,14 +121,14 @@ Copy your new license here and then reload the license service to refresh:
 " > "$licdir/README"
 chmod --verbose 644 "$licdir/README"
 chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
-echo $note Save new license files in $licdir
+echo $note License files should be stored in $licdir
 
 # {{{1 Setup log file directory
 echo Setting up log file directory
 logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
-chown --verbose "$LMADMIN" "$logdir" || exit 1
-chmod --verbose 755 "$logdir" || exit 1
+chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
+chmod --verbose --recursive 755 "$logdir" || exit 1
 
 # {{{1 Setup logrotate
 logrotate=/etc/logrotate.d/abaqus-lm
