@@ -12,6 +12,7 @@ INTRO
 
 error=$(tput setaf 1)ERROR:$(tput sgr 0) || error="ERROR:"
 warning=$(tput setab 3)WARNING:$(tput sgr 0) || warning="WARNING:"
+note=$(tput setab 2)NOTE:$(tput sgr 0) || warning="NOTE:"
 
 if [ "$(id -u)" -ne 0 ] # {{{1 Got root?
 then
@@ -120,6 +121,7 @@ Copy your new license here and then reload the license service to refresh:
 README
 chmod --verbose 644 "$licdir/README"
 chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
+echo $note Save new license files in $licdir
 
 # {{{1 Setup log file directory
 echo Setting up log file directory
