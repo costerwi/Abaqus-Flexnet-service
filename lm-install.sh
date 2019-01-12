@@ -85,7 +85,7 @@ case ${#abaquslm[@]} in
         exit 1
         ;;
     1)
-        LMBIN=${abaquslm[1]}
+        LMBIN=${abaquslm[0]}
         ;;
     *)
         read -rp "Choose number for the license server to use or 0 to abort [1]: " response
