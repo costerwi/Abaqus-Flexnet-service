@@ -90,7 +90,7 @@ case ${#abaquslm[@]} in
     *)
         read -rp "Choose number for the license server to use or 0 to abort [1]: " response
         response=${response:-1} # default to 1
-        if [ "$response" -gt 0 -a "$response" -le ${#abaquslm[@]} ]
+        if [ "$response" -ge 1 -a "$response" -le ${#abaquslm[@]} ]
         then
             LMBIN=${abaquslm[(($response-1))]}
         else
