@@ -43,10 +43,10 @@ fi
 echo
 
 # {{{1 Check if already running lmgrd
-if lmgrd_pid=($(pidof lmgrd))
+if lmgrd_pid=$(pidof lmgrd)
 then
     echo $warning There is already a Flexnet license server running:
-    ps -p "${lmgrd_pid[@]}" -o pid,cmd
+    ps -p "$lmgrd_pid" -o pid,cmd
     #TODO get the base directory of this running lmgrd
     echo
     read -rp "Continue installing this service? [y]/n " response
