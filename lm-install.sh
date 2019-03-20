@@ -104,7 +104,7 @@ then
     echo License administrator "$LMADMIN" exists and will be used
 else
     echo Creating license administrator "$LMADMIN"
-    useradd --system --home-dir /sbin --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
+    useradd -d /sbin --system --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
 fi
 
 # {{{1 Setup license file directory
