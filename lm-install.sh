@@ -54,6 +54,7 @@ then
 fi
 
 # {{{1 Check for SIMULIA directory in common locations
+# TODO Try to run Abaqus and query its installation directory
 for d in $SIMULIA /usr/SIMULIA/License /usr/SIMULIA /opt/SIMULIA /opt/CAE/SIMULIA
 do
     if [ -d "$d" ]
