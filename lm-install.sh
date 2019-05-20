@@ -181,7 +181,7 @@ echo Creating SysV init script $initd/$service
 echo "\
 #!/bin/sh
 #
-# chkconfig: - 91 35
+# chkconfig: 2345 91 35
 # description: Starts and stops the abaqus-lm license daemon
 
 # Source function library.
