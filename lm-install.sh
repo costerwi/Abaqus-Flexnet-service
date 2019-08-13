@@ -141,9 +141,9 @@ echo "\
 $logdir/*.log {
     missingok
     notifyempty
-    sharedscripts
-    delaycompress
-    endscript
+    copytruncate
+    weekly
+    rotate 5
 }" >"$logrotate" || exit 1
 chmod --verbose 644 "$logrotate" || exit 1
 fi
