@@ -32,27 +32,6 @@ do
         break
     fi
 done
-LICENSE=$1 # {{{1 Check for existence license file
-test -f "$LICENSE" || read -rp "Enter license file name: " LICENSE
-if [ ! -f "$LICENSE" ]
-then
-    echo $error License file "$LICENSE" not found.
-    exit 1
-fi
-
-# {{{1 Check format of license file
-if grep -q "VENDOR ABAQUSLM" "$LICENSE"
-then
-    echo "$LICENSE" includes the following features:
-    grep FEATURE "$LICENSE"
-else
-    echo $warning "$LICENSE" does not appear to be a Flexnet license file.
-    echo You may have received a DSLS license or the file may be corrupt.
-    #TODO check for DSLS and add support for DSLS license server
-    read -rp "Continue? [y]/n " response
-    test "$response" = "n" && exit 1
-fi
-echo
 
 # {{{1 Check for SIMULIA directory in common locations
 # TODO Try to run Abaqus and query its installation directory
