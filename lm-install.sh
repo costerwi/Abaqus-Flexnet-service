@@ -20,6 +20,18 @@ then
     exit 1
 fi
 
+# {{{1 Check for currently running ABAQUSLM license server
+for p in $(pidof lmgrd)
+do
+    exe=$(readlink -f /proc/$p/exe)
+    dir=$(dirname $exe)
+    if [ -f "$dir/ABAQUSLM" ]
+    then
+        SIMULIA=$dir
+        kill $p
+        break
+    fi
+done
 LICENSE=$1 # {{{1 Check for existence license file
 test -f "$LICENSE" || read -rp "Enter license file name: " LICENSE
 if [ ! -f "$LICENSE" ]
@@ -41,17 +53,6 @@ else
     test "$response" = "n" && exit 1
 fi
 echo
-
-# {{{1 Check if already running lmgrd
-if lmgrd_pid=$(pidof lmgrd)
-then
-    echo $warning There is already a Flexnet license server running:
-    ps -p "$lmgrd_pid" -o pid,cmd
-    #TODO get the base directory of this running lmgrd
-    echo
-    read -rp "Continue installing this service? [y]/n " response
-    test "$response" = "n" && exit 1
-fi
 
 # {{{1 Check for SIMULIA directory in common locations
 # TODO Try to run Abaqus and query its installation directory
