@@ -119,6 +119,7 @@ for f in "$LMBIN"/*.LIC *.LIC $1
 do
     cp -vp "$f" "$licdir"
 done
+ln --verbose --symbolic "$licdir" "$LMBIN/licenses"
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
 Please contact support@caelynx.com if you have any trouble.
