@@ -115,7 +115,10 @@ echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d "$licdir" || mkdir --verbose "$licdir"
 chmod --verbose 2755 "$licdir" || exit 1
-cp --verbose "$LICENSE" "$licdir"
+for f in "$LMBIN"/*.LIC *.LIC $1
+do
+    cp -vp "$f" "$licdir"
+done
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
 Please contact support@caelynx.com if you have any trouble.
