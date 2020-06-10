@@ -137,6 +137,7 @@ test -d "$logdir" || mkdir --verbose "$logdir"
 chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
 chmod --verbose --recursive 755 "$logdir" || exit 1
 ln --verbose --symbolic --force "$logdir" "$licdir/log"
+ln --verbose --symbolic --force "$logdir" "$LMBIN/log"
 
 # {{{1 Setup logrotate
 logrotate=/etc/logrotate.d/abaqus-lm
