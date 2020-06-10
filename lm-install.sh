@@ -108,6 +108,7 @@ else
     echo Creating license administrator "$LMADMIN"
     useradd -d /sbin --system --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
 fi
+usermod -a -G $LMADMIN $USER # add this user to license admin group
 
 # {{{1 Setup license file directory
 echo Setting up the license file directory
