@@ -161,6 +161,9 @@ systemctl daemon-reload # Parse the new service file
 systemctl enable --now $service # Start now and enable on reboot
 echo systemctl reload ${service%.*} >>"$licdir/README"
 
+sleep 2
+systemctl status $service # Report status of new service
+
 else # {{{1 Assume SysV init
 initd=/etc/rc.d/init.d
 service=abaqus-lm
@@ -243,6 +246,9 @@ chmod --verbose 755 "$initd/$service" || exit 1
 chkconfig --add $service
 service $service start
 echo service $service reload >>"$licdir/README"
+
+sleep 2
+service $service status # Report status of new service
 
 fi
 
