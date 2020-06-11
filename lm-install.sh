@@ -119,21 +119,6 @@ ln --verbose --symbolic --force "$licdir" "$logdir/licenses"
 ln --verbose --symbolic --force "$logdir" "$licdir/log"
 ln --verbose --symbolic --force "$logdir" "$LMBIN/log"
 
-# {{{1 Setup logrotate
-logrotate=/etc/logrotate.d/abaqus-lm
-if [ -d "$(dirname $logrotate)" ]
-then
-echo Creating "$logrotate"
-echo "\
-$logdir/*.log {
-    missingok
-    notifyempty
-    copytruncate
-    weekly
-    rotate 5
-}" >"$logrotate" || exit 1
-chmod --verbose 644 "$logrotate" || exit 1
-fi
 
 if pidof systemd >/dev/null # {{{1 systemd system
 then
@@ -250,6 +235,22 @@ echo service $service reload >>"$licdir/README"
 sleep 2
 service $service status # Report status of new service
 
+fi
+
+# {{{1 Setup logrotate
+logrotate=/etc/logrotate.d/abaqus-lm
+if [ -d "$(dirname $logrotate)" ]
+then
+echo Creating "$logrotate"
+echo "\
+$logdir/*.log {
+    missingok
+    notifyempty
+    copytruncate
+    weekly
+    rotate 5
+}" >"$logrotate" || exit 1
+chmod --verbose 644 "$logrotate" || exit 1
 fi
 
 # TODO Firewall {{{1
