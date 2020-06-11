@@ -6,9 +6,15 @@ service on Linux Redhat/CentOS version 6.x or 7.x computers.
 The license service will be started by this script and will also be set to
 autostart whenever the system boots.
 
+Flexnet license files in the Flexnet directory, current directory, or
+specified on the command line will be copied to the appropriate location.
+
+This script may be re-run to update the annual license file.
+
 If you have any questions, please contact support@caelynx.com
 
 "
+# Carl Osterwisch, November 2018
 
 error=$(tput setaf 1)ERROR:$(tput sgr 0) || error="ERROR:"
 warning=$(tput setab 3)WARNING:$(tput sgr 0) || warning="WARNING:"
