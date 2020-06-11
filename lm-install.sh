@@ -98,7 +98,6 @@ for f in "$LMBIN"/*.LIC *.LIC $1
 do
     cp -vp "$f" "$licdir"
 done
-ln --verbose --symbolic "$licdir" "$LMBIN/licenses"
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
 Please contact support@caelynx.com if you have any trouble.
@@ -115,10 +114,13 @@ logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
 chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
 chmod --verbose --recursive 755 "$logdir" || exit 1
-ln --verbose --symbolic --force "$licdir" "$logdir/licenses"
-ln --verbose --symbolic --force "$logdir" "$licdir/log"
-ln --verbose --symbolic --force "$logdir" "$LMBIN/log"
 
+# {{{1 Create helpful symbolic links
+test -n "$USER" && su $USER --command "ln --verbose --symbolic --force --no-dereference \"$licdir\" ."
+ln --verbose --symbolic --force --no-dereference "$licdir" "$logdir/licenses"
+ln --verbose --symbolic --force --no-dereference "$logdir" "$licdir/log"
+ln --verbose --symbolic --force --no-dereference "$licdir" "$LMBIN/licenses"
+ln --verbose --symbolic --force --no-dereference "$logdir" "$LMBIN/log"
 
 if pidof systemd >/dev/null # {{{1 systemd system
 then
