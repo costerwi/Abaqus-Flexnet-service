@@ -115,6 +115,7 @@ logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
 chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
 chmod --verbose --recursive 755 "$logdir" || exit 1
+ln --verbose --symbolic --force "$licdir" "$logdir/licenses"
 ln --verbose --symbolic --force "$logdir" "$licdir/log"
 ln --verbose --symbolic --force "$logdir" "$LMBIN/log"
 
