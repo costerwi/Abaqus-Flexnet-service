@@ -150,8 +150,8 @@ if pidof systemd >/dev/null # {{{1 systemd system
 then
 sysd=/etc/systemd/system
 service=abaqus-lm.service
+test -f "$sysd/$service" && systemctl stop ${service%.*}
 echo Creating systemd service "$sysd/$service"
-
 echo "\
 [Unit]
 Description=Abaqus flexlm license daemon
