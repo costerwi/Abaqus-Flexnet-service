@@ -152,6 +152,7 @@ systemctl status $service # Report status of new service
 else # {{{1 Assume SysV init
 initd=/etc/rc.d/init.d
 service=abaqus-lm
+test -f "$initd/$service" && service $service stop
 echo Creating SysV init script $initd/$service
 echo "\
 #!/bin/sh
