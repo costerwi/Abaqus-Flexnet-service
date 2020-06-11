@@ -94,9 +94,10 @@ echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d "$licdir" || mkdir --verbose "$licdir"
 chmod --verbose 2755 "$licdir" || exit 1
-for f in "$LMBIN"/*.LIC *.LIC $1
+echo $note License files should be stored in $licdir
+for f in "$LMBIN"/*.LIC *.LIC "$@"
 do
-    cp -vp "$f" "$licdir"
+    test -f "$f" && cp --verbose --preserve=timestamps "$f" "$licdir"
 done
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
@@ -106,7 +107,6 @@ Copy your new license here and then reload the license service to refresh:
 " > "$licdir/README"
 chmod --verbose 644 "$licdir/README"
 chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
-echo $note License files should be stored in $licdir
 
 # {{{1 Setup log file directory
 echo Setting up log file directory
