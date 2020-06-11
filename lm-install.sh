@@ -27,6 +27,7 @@ do
     dir=$(dirname $exe)
     if [ -f "$dir/ABAQUSLM" ]
     then
+        echo $note Found running ABAQUSLM in $dir
         SIMULIA=$dir
         kill $p
         break
@@ -67,6 +68,7 @@ case ${#abaquslm[@]} in
         ;;
     1)
         LMBIN=${abaquslm[0]}
+        echo $note License service will use Flexnet in $LMBIN
         ;;
     *)
         read -rp "Choose number for the license server to use or 0 to abort [1]: " response
@@ -79,12 +81,12 @@ case ${#abaquslm[@]} in
         fi
 esac
 
-LMADMIN=${LMADMIN:-lmadmin} # {{{1 check for user
+LMADMIN=${LMADMIN:-lmadmin} # {{{1 check for lmadmin user
 if id -u "$LMADMIN" >/dev/null 2>&1
 then
-    echo License administrator "$LMADMIN" exists and will be used
+    echo $note License administrator "$LMADMIN" exists and will be used
 else
-    echo Creating license administrator "$LMADMIN"
+    echo $note Creating license administrator "$LMADMIN"
     useradd -d /sbin --system --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
 fi
 test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license admin group
