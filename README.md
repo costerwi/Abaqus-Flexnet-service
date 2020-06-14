@@ -2,7 +2,9 @@
 Script to configure the Abaqus Flexnet License Daemon as a restartable service
 
 Usage:
+```
 ./lm-install.sh
+```
 
 This script performs several steps to get Flexnet setup as a service under Redhat/CentOS version 6.x or 7.x.
 It will:
