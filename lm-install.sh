@@ -101,7 +101,7 @@ test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license ad
 echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d "$licdir" || mkdir --verbose "$licdir"
-chmod --verbose 2755 "$licdir" || exit 1
+chmod --verbose 2775 "$licdir" || exit 1
 echo $note License files should be stored in $licdir
 for f in "$LMBIN"/*.LIC *.LIC "$@"
 do
