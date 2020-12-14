@@ -159,6 +159,7 @@ After=network.target
 
 [Service]
 User=$LMADMIN
+Environment="FLEXLM_TIMEOUT=1000000"
 ExecStart=$LMBIN/lmgrd -z -l +$logdir/lmgrd.log -c $licdir
 ExecStop=$LMBIN/lmdown -q -c $licdir
 ExecReload=$LMBIN/lmreread -c $licdir
@@ -201,6 +202,7 @@ LMBIN=$LMBIN
 
 start() {
     echo -n \$\"Starting \$KIND services: \"
+    FLEXLM_TIMEOUT=1000000
     daemon --user $LMADMIN \$LMBIN/lmgrd -c \$LM_LICENSE_FILE -l +$logdir/lmgrd.log
     return \$?
 }
