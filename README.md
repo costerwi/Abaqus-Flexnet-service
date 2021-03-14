@@ -1,5 +1,5 @@
 # Abaqus-Flexnet-service
-Script to configure the Abaqus Flexnet License Daemon as a restartable service
+Script to configure the Abaqus Flexnet License Daemon as a restartable Linux service
 
 Usage:
 ```
