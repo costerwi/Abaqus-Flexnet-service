@@ -161,8 +161,8 @@ After=network.target
 User=$LMADMIN
 Environment="FLEXLM_TIMEOUT=1000000"
 ExecStart=$LMBIN/lmgrd -z -l +$logdir/lmgrd.log -c $licdir
-ExecStop=$LMBIN/lmdown -q -c $licdir
-ExecReload=$LMBIN/lmreread -c $licdir
+ExecStop=$LMBIN/lmutil lmdown -q -c $licdir
+ExecReload=$LMBIN/lmutil lmreread -c $licdir
 
 [Install]
 WantedBy=multi-user.target" >"$sysd/$service" || exit 1
@@ -209,7 +209,7 @@ start() {
 
 stop() {
     echo -n \$\"Shutting down \$KIND services: \"
-    \$LMBIN/lmdown -c \$LM_LICENSE_FILE -q >/dev/null
+    \$LMBIN/lmutil lmdown -c \$LM_LICENSE_FILE -q >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
     return \$RETVAL
@@ -222,14 +222,14 @@ restart() {
 
 reload() {
     echo -n \$\"Reloading \$LM_LICENSE_FILE directory: \"
-    \$LMBIN/lmreread -c \$LM_LICENSE_FILE >/dev/null
+    \$LMBIN/lmutil lmreread -c \$LM_LICENSE_FILE >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
     return \$RETVAL
 }
 
 status() {
-    \$LMBIN/lmstat -c \$LM_LICENSE_FILE
+    \$LMBIN/lmutil lmstat -c \$LM_LICENSE_FILE
     return \$?
 }
 
