@@ -1,7 +1,10 @@
 #!/bin/bash
 echo "
 This script configures the Abaqus Flexnet License Daemon as a restartable
-service on Linux Redhat/CentOS version 6.x or 7.x computers.
+service on Linux Redhat (6 & 7) and SUSE (12) computers.
+
+Usage:
+    bash lm-install.sh [mylicense.LIC]
 
 The license service will be started by this script and will also be set to
 autostart whenever the system boots.
@@ -11,7 +14,7 @@ specified on the command line will be copied to the appropriate location.
 
 This script may be re-run to update the annual license file.
 
-If you have any questions, please contact support@caelynx.com
+If you have any questions, please contact simsupport@cati.com
 
 "
 # Carl Osterwisch, November 2018
@@ -93,7 +96,7 @@ then
     echo $note License administrator "$LMADMIN" exists and will be used
 else
     echo $note Creating license administrator "$LMADMIN"
-    useradd -d /sbin --system --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
+    useradd -d /sbin --system --user-group --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
 fi
 test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license admin group
 
@@ -101,7 +104,7 @@ test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license ad
 echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d "$licdir" || mkdir --verbose "$licdir"
-chmod --verbose 2775 "$licdir" || exit 1
+chmod --verbose 2755 "$licdir"
 echo $note License files should be stored in $licdir
 for f in "$LMBIN"/*.LIC *.LIC "$@"
 do
@@ -109,19 +112,19 @@ do
 done
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
-Please contact support@caelynx.com if you have any trouble.
+Please contact simsupport@cati.com if you have any trouble.
 License file names must end with .LIC
 Copy your new license here and then reload the license service to refresh:
 " > "$licdir/README"
 chmod --verbose 644 "$licdir/README"
-chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
+chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir"
 
 # {{{1 Setup log file directory
 echo Setting up log file directory
 logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
-chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
-chmod --verbose --recursive 755 "$logdir" || exit 1
+chown --verbose --recursive "$LMADMIN" "$logdir"
+chmod --verbose --recursive 755 "$logdir"
 
 # {{{1 Create helpful symbolic links
 test -n "$USER" && su $USER --command "ln --verbose --symbolic --force --no-dereference \"$licdir\" ."
@@ -142,8 +145,7 @@ $logdir/*.log {
     copytruncate
     weekly
     rotate 5
-}" >"$logrotate" || exit 1
-chmod --verbose 644 "$logrotate"
+}" >"$logrotate" && chmod --verbose 644 "$logrotate"
 fi
 
 if pidof systemd >/dev/null # {{{1 systemd system
@@ -161,16 +163,17 @@ After=network.target
 User=$LMADMIN
 Environment="FLEXLM_TIMEOUT=1000000"
 ExecStart=$LMBIN/lmgrd -z -l +$logdir/lmgrd.log -c $licdir
-ExecStop=$LMBIN/lmdown -q -c $licdir
-ExecReload=$LMBIN/lmreread -c $licdir
+ExecStop=$LMBIN/lmutil lmdown -q -c $licdir
+ExecReload=$LMBIN/lmutil lmreread -c $licdir
 
 [Install]
 WantedBy=multi-user.target" >"$sysd/$service" || exit 1
-chmod --verbose 664 "$sysd/$service" || exit 1
+chmod --verbose 664 "$sysd/$service"
 
 echo Starting the service $service
 systemctl daemon-reload # Parse the new service file
-systemctl enable --now $service # Start now and enable on reboot
+systemctl enable $service # Start on reboot
+systemctl start $service  # Start now
 echo systemctl reload ${service%.*} >>"$licdir/README"
 
 sleep 2
@@ -209,7 +212,7 @@ start() {
 
 stop() {
     echo -n \$\"Shutting down \$KIND services: \"
-    \$LMBIN/lmdown -c \$LM_LICENSE_FILE -q >/dev/null
+    \$LMBIN/lmutil lmdown -c \$LM_LICENSE_FILE -q >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
     return \$RETVAL
@@ -222,14 +225,14 @@ restart() {
 
 reload() {
     echo -n \$\"Reloading \$LM_LICENSE_FILE directory: \"
-    \$LMBIN/lmreread -c \$LM_LICENSE_FILE >/dev/null
+    \$LMBIN/lmutil lmreread -c \$LM_LICENSE_FILE >/dev/null
     RETVAL=\$?
     [ 0 -eq \$RETVAL ] && success || failure
     return \$RETVAL
 }
 
 status() {
-    \$LMBIN/lmstat -c \$LM_LICENSE_FILE
+    \$LMBIN/lmutil lmstat -c \$LM_LICENSE_FILE
     return \$?
 }
 
@@ -255,7 +258,7 @@ case \"\$1\" in
 esac
 
 exit \$?" >"$initd/$service" || exit 1
-chmod --verbose 755 "$initd/$service" || exit 1
+chmod --verbose 755 "$initd/$service"
 
 chkconfig --add $service
 service $service start
