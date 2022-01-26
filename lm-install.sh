@@ -11,7 +11,7 @@ specified on the command line will be copied to the appropriate location.
 
 This script may be re-run to update the annual license file.
 
-If you have any questions, please contact support@caelynx.com
+If you have any questions, please contact simsupport@cati.com
 
 "
 # Carl Osterwisch, November 2018
@@ -109,7 +109,7 @@ do
 done
 echo -n "\
 This directory will be scanned to find the current Abaqus license.
-Please contact support@caelynx.com if you have any trouble.
+Please contact simsupport@cati.com if you have any trouble.
 License file names must end with .LIC
 Copy your new license here and then reload the license service to refresh:
 " > "$licdir/README"
