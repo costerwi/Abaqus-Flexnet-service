@@ -170,7 +170,8 @@ chmod --verbose 664 "$sysd/$service" || exit 1
 
 echo Starting the service $service
 systemctl daemon-reload # Parse the new service file
-systemctl enable --now $service # Start now and enable on reboot
+systemctl enable $service # Start on reboot
+systemctl start $service  # Start now
 echo systemctl reload ${service%.*} >>"$licdir/README"
 
 sleep 2
