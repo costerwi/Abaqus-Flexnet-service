@@ -101,7 +101,7 @@ test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license ad
 echo Setting up the license file directory
 licdir=/etc/abaqus-lm
 test -d "$licdir" || mkdir --verbose "$licdir"
-chmod --verbose 2775 "$licdir" || exit 1
+chmod --verbose 2755 "$licdir"
 echo $note License files should be stored in $licdir
 for f in "$LMBIN"/*.LIC *.LIC "$@"
 do
@@ -114,14 +114,14 @@ License file names must end with .LIC
 Copy your new license here and then reload the license service to refresh:
 " > "$licdir/README"
 chmod --verbose 644 "$licdir/README"
-chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir" || exit 1
+chown --verbose --recursive "$LMADMIN:$LMADMIN" "$licdir"
 
 # {{{1 Setup log file directory
 echo Setting up log file directory
 logdir=/var/log/abaqus-lm
 test -d "$logdir" || mkdir --verbose "$logdir"
-chown --verbose --recursive "$LMADMIN" "$logdir" || exit 1
-chmod --verbose --recursive 755 "$logdir" || exit 1
+chown --verbose --recursive "$LMADMIN" "$logdir"
+chmod --verbose --recursive 755 "$logdir"
 
 # {{{1 Create helpful symbolic links
 test -n "$USER" && su $USER --command "ln --verbose --symbolic --force --no-dereference \"$licdir\" ."
@@ -142,8 +142,7 @@ $logdir/*.log {
     copytruncate
     weekly
     rotate 5
-}" >"$logrotate" || exit 1
-chmod --verbose 644 "$logrotate"
+}" >"$logrotate" && chmod --verbose 644 "$logrotate"
 fi
 
 if pidof systemd >/dev/null # {{{1 systemd system
@@ -166,7 +165,7 @@ ExecReload=$LMBIN/lmutil lmreread -c $licdir
 
 [Install]
 WantedBy=multi-user.target" >"$sysd/$service" || exit 1
-chmod --verbose 664 "$sysd/$service" || exit 1
+chmod --verbose 664 "$sysd/$service"
 
 echo Starting the service $service
 systemctl daemon-reload # Parse the new service file
@@ -256,7 +255,7 @@ case \"\$1\" in
 esac
 
 exit \$?" >"$initd/$service" || exit 1
-chmod --verbose 755 "$initd/$service" || exit 1
+chmod --verbose 755 "$initd/$service"
 
 chkconfig --add $service
 service $service start
