@@ -93,7 +93,7 @@ then
     echo $note License administrator "$LMADMIN" exists and will be used
 else
     echo $note Creating license administrator "$LMADMIN"
-    useradd -d /sbin --system --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
+    useradd -d /sbin --system --user-group --shell /sbin/nologin --comment "License manager" "$LMADMIN" || exit 1
 fi
 test -n "$USER" && usermod -a -G $LMADMIN $USER # add current user to license admin group
 
